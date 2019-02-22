@@ -8,7 +8,6 @@ from configreader import *
 class Example(QWidget):
     def __init__(self):
         super().__init__()
-        self.music = CheckMusic()
         self.check_assetbundle = QtWidgets.QCheckBox(self)
         self.check_musicsmp = QtWidgets.QCheckBox(self)
         self.check_stage = QtWidgets.QCheckBox(self)
@@ -133,22 +132,22 @@ class Example(QWidget):
 
         # 将配置加载到界面显示
         # 勾选框显示处理
-        self.check_assetbundle.setChecked(int(self.music.check_assetbundle))
-        self.check_musicsmp.setChecked(int(self.music.check_musicsmp))
-        self.check_stage.setChecked(int(self.music.check_stage))
-        self.check_fairlyland.setChecked(int(self.music.check_fairlyland))
-        self.check_dama.setChecked(int(self.music.check_dama))
-        self.check_magiclamp.setChecked(int(self.music.check_magiclamp))
-        self.check_lwstar.setChecked(int(self.music.check_lwstar))
-        self.check_starmentor.setChecked(int(self.music.check_starmentor))
-        self.check_musicrank.setChecked(int(self.music.check_musicrank))
-        self.check_diamondleague.setChecked(int(self.music.check_diamondleague))
+        self.check_assetbundle.setChecked(int(music.check_assetbundle))
+        self.check_musicsmp.setChecked(int(music.check_musicsmp))
+        self.check_stage.setChecked(int(music.check_stage))
+        self.check_fairlyland.setChecked(int(music.check_fairlyland))
+        self.check_dama.setChecked(int(music.check_dama))
+        self.check_magiclamp.setChecked(int(music.check_magiclamp))
+        self.check_lwstar.setChecked(int(music.check_lwstar))
+        self.check_starmentor.setChecked(int(music.check_starmentor))
+        self.check_musicrank.setChecked(int(music.check_musicrank))
+        self.check_diamondleague.setChecked(int(music.check_diamondleague))
         # 文本框显示处理
-        self.music_file_dir.setPlainText(self.music.music_file_dir)
-        self.stage_dir.setPlainText(self.music.stage_dir)
-        self.controller_txt_dir.setPlainText(self.music.controller_txt_dir)
-        self.adb_assetbundle_file_dir.setPlainText(self.music.adb_assetbundle_file_dir)
-        self.ios_assetbundle_file_dir.setPlainText(self.music.ios_assetbundle_file_dir)
+        self.music_file_dir.setPlainText(music.music_file_dir)
+        self.stage_dir.setPlainText(music.stage_dir)
+        self.controller_txt_dir.setPlainText(music.controller_txt_dir)
+        self.adb_assetbundle_file_dir.setPlainText(music.adb_assetbundle_file_dir)
+        self.ios_assetbundle_file_dir.setPlainText(music.ios_assetbundle_file_dir)
 
     def closeEvent(self, event):
         reply = QMessageBox.question(self, '提示', '确认退出吗？',
@@ -182,11 +181,35 @@ class Example(QWidget):
                 config.CReader.write(f)
 
         # 将修改的状态同步到checkmusic类中
-        self.music.music_file_dir = self.music_file_dir.toPlainText()
-        self.music.stage_dir = self.stage_dir.toPlainText()
-        self.music.controller_txt_dir = self.controller_txt_dir.toPlainText()
-        self.music.adb_assetbundle_file_dir = self.adb_assetbundle_file_dir.toPlainText()
-        self.music.ios_assetbundle_file_dir = self.ios_assetbundle_file_dir.toPlainText()
+        if os.path.exists(self.music_file_dir.toPlainText()):
+            music.music_file_dir = self.music_file_dir.toPlainText()
+        else:
+            QMessageBox.critical(self, "提示", self.tr("资源地址不存在，请检查!"), QMessageBox.Ok)
+            return
+
+        if os.path.exists(self.stage_dir.toPlainText()):
+            music.stage_dir = self.stage_dir.toPlainText()
+        else:
+            QMessageBox.critical(self, "提示", self.tr("资源地址不存在，请检查!"), QMessageBox.Ok)
+            return
+
+        if os.path.exists(self.controller_txt_dir.toPlainText()):
+            music.music_file_dir = self.controller_txt_dir.toPlainText()
+        else:
+            QMessageBox.critical(self, "提示", self.tr("资源地址不存在，请检查!"), QMessageBox.Ok)
+            return
+
+        if os.path.exists(self.adb_assetbundle_file_dir.toPlainText()):
+            music.music_file_dir = self.adb_assetbundle_file_dir.toPlainText()
+        else:
+            QMessageBox.critical(self, "提示", self.tr("资源地址不存在，请检查!"), QMessageBox.Ok)
+            return
+
+        if os.path.exists(self.ios_assetbundle_file_dir.toPlainText()):
+            music.music_file_dir = self.ios_assetbundle_file_dir.toPlainText()
+        else:
+            QMessageBox.critical(self, "提示", self.tr("资源地址不存在，请检查!"), QMessageBox.Ok)
+            return
 
     def start(self):
         # 将修改的状态进行保存和同步
@@ -195,48 +218,48 @@ class Example(QWidget):
 
         # 检查音乐表中相关资源是否存在
         if self.check_assetbundle.isChecked():
-            result = self.music.process_assetbundle()
+            result = music.process_assetbundle()
             resultstr = resultstr + "\nDance.txt文件检查结果：" + str(result[0]) + \
                         "\n安卓平台动作文件检查结果：" + str(result[1]) + "\nios平台动作文件检查结果：" \
                         + str(result[2])
 
         if self.check_musicsmp.isChecked():
-            result = self.music.process_music_smp()
+            result = music.process_music_smp()
             resultstr = resultstr + "\n音乐smp文件检查结果：" + str(result)
 
         if self.check_stage.isChecked():
-            result = self.music.process_stage()
+            result = music.process_stage()
             resultstr = resultstr + "\n安卓平台stage文件文件检查结果：" + str(result[0]) + \
                         "\nios平台stage文件文件检查结果：" + str(result[1])
 
         # 检查其他功能模块中配置的歌曲信息在音乐表中是否存在
         if self.check_dama.isChecked():
-            result = self.music.process_dama()
+            result = music.process_dama()
             resultstr = resultstr + "\n广场舞大妈.xlsx检查结果：" + str(result)
 
         if self.check_fairlyland.isChecked():
-            result = self.music.process_fairlyland()
+            result = music.process_fairlyland()
             resultstr = resultstr + "\n舞团秘境.xlsx检查结果：" + str(result)
 
         if self.check_lwstar.isChecked():
-            result = self.music.process_lwstar()
+            result = music.process_lwstar()
             resultstr = resultstr + "\n恋舞之星.xlsx检查结果：" + str(result)
 
         if self.check_magiclamp.isChecked():
-            result = self.music.process_magiclamp()
+            result = music.process_magiclamp()
             resultstr = resultstr + "\n魔法神灯.xlsx-主线关卡检查结果：" + str(result[0]) + \
                         "\n魔法神灯.xlsx-主题关卡检查结果：" + str(result[1])
 
         if self.check_diamondleague.isChecked():
-            result = self.music.process_diamondleague()
+            result = music.process_diamondleague()
             resultstr = resultstr + "\n钻石联赛.xlsx检查结果：" + str(result)
 
         if self.check_musicrank.isChecked():
-            result = self.music.process_musicrank()
+            result = music.process_musicrank()
             resultstr = resultstr + "\n音悦榜.xlsx检查结果：" + str(result)
 
         if self.check_starmentor.isChecked():
-            result = self.music.process_starmentor()
+            result = music.process_starmentor()
             resultstr = resultstr + "\n星恋挑战.xlsx检查结果：" + str(result)
 
         # 结果输入到resulttxt框控件内
@@ -246,6 +269,7 @@ class Example(QWidget):
 
 
 if __name__ == '__main__':
+    music = CheckMusic()
     app = QApplication(sys.argv)
     ex = Example()
     sys.exit(app.exec_())
