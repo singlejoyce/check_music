@@ -3,4 +3,5 @@
 dist
 build
 __pycache__
-./mainui.spec
+mainui.spec
+Logs
