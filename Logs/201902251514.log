@@ -1,0 +1,14 @@
+2019-02-25 15:14:14,663 - CheckMusic - INFO - Dance.txt文件未缺失！
+2019-02-25 15:14:14,753 - CheckMusic - INFO - 安卓平台动作文件未缺失！
+2019-02-25 15:14:14,753 - CheckMusic - ERROR - iOS平台缺失的动作文件为：['KONGMING03.assetbundle', 'LATATA01.assetbundle', 'LATATA03.assetbundle', 'LATATA04.assetbundle', 'LATATA02.assetbundle', 'KONGMING04.assetbundle', 'KONGMING01.assetbundle', 'KONGMING02.assetbundle']
+2019-02-25 15:14:14,756 - CheckMusic - INFO - 音乐资源smp文件未缺失！
+2019-02-25 15:14:14,784 - CheckMusic - INFO - 安卓平台stage文件未缺失！
+2019-02-25 15:14:14,784 - CheckMusic - INFO - iOS平台stage文件未缺失！
+2019-02-25 15:14:14,815 - CheckMusic - ERROR - 广场舞大妈.xlsx中在音乐表中不存在的歌曲信息：['1111,2,2']
+2019-02-25 15:14:14,876 - CheckMusic - INFO - 舞团秘境.xlsx检查通过！
+2019-02-25 15:14:14,908 - CheckMusic - INFO - 恋舞之星.xlsx检查通过！
+2019-02-25 15:14:15,020 - CheckMusic - INFO - 魔法神灯.xlsx-主线关卡sheet检查通过！
+2019-02-25 15:14:15,132 - CheckMusic - INFO - 魔法神灯.xlsx-主题关卡sheet检查通过！
+2019-02-25 15:14:15,166 - CheckMusic - INFO - 钻石联赛.xlsx检查通过！
+2019-02-25 15:14:15,183 - CheckMusic - INFO - 音悦榜.xlsx检查通过！
+2019-02-25 15:14:15,259 - CheckMusic - INFO - 星恋挑战.xlsx检查通过！

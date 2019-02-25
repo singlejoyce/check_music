@@ -3,7 +3,6 @@ from PyQt5.QtWidgets import *
 from checkmusic import *
 from configreader import *
 
-
 __author__ = "joyce"
 
 
@@ -129,7 +128,7 @@ class Example(QWidget):
         self.check_musicrank.setText(_translate("Dialog", "检查音悦榜歌曲配置"))
         self.check_diamondleague.setText(_translate("Dialog", "检查钻石联赛歌曲配置"))
         self.startButton.setText(_translate("Dialog", "开始检查"))
-        self.label_7.setText(_translate("Dialog", "结果说明:\n配置正常时结果格式为：[]\n配置异常时结果格式为：[歌曲ID,歌曲模式,歌曲难度]"))
+        self.label_7.setText(_translate("Dialog", "结果说明:\n配置正常时结果格式为：[]"))
         self.label_8.setText(_translate("Dialog", "iOS-Animations地址："))
 
         # 将配置加载到界面显示
@@ -239,7 +238,7 @@ class Example(QWidget):
 
         if self.check_musicsmp.isChecked():
             result = music.process_music_smp()
-            resultstr = resultstr + "\n音乐smp文件检查结果：" + str(result)
+            resultstr = resultstr + "\n音乐smp文件检查结果：" + str(result[0]) + "\n音乐sog文件检查结果：" + str(result[1])
 
         if self.check_stage.isChecked():
             result = music.process_stage()
@@ -316,6 +315,7 @@ class Example(QWidget):
         # 检查结束，弹出检查完成提示框
         QMessageBox.information(self, "提示", self.tr("音乐检查完成!"), QMessageBox.Ok)
         return True
+
 
 if __name__ == '__main__':
     music = CheckMusic()

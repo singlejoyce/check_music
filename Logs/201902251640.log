@@ -1,0 +1,4 @@
+2019-02-25 16:40:18,703 - CheckMusic - INFO - 音乐资源smp文件未缺失！
+2019-02-25 16:40:18,706 - CheckMusic - INFO - 音乐资源smp文件未缺失！
+2019-02-25 16:41:11,587 - CheckMusic - INFO - 音乐资源smp文件未缺失！
+2019-02-25 16:41:11,589 - CheckMusic - ERROR - 缺失的音乐资源smp文件为：['D:\\project\\LoveDance_N1\\client_n1_1\\Res\\Music\\song0456.sog', 'D:\\project\\LoveDance_N1\\client_n1_1\\Res\\Music\\song0451.sog', 'D:\\project\\LoveDance_N1\\client_n1_1\\Res\\Music\\song0475.sog', 'D:\\project\\LoveDance_N1\\client_n1_1\\Res\\Music\\song0314.sog', 'D:\\project\\LoveDance_N1\\client_n1_1\\Res\\Music\\song0489.sog']

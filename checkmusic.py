@@ -1,9 +1,7 @@
 # -*- coding: UTF-8 -*-
 import os
 import re
-
 import sys
-
 from logger import Logger
 from configreader import *
 import pandas as pd
@@ -65,6 +63,16 @@ class CheckMusic(object):
                         L.append(os.path.join(root, file))
         return L
 
+    def get_music_sog_file(self, file_dir):
+        # 获得音乐smp文件路径
+        L = []
+        for root, dirs, files in os.walk(file_dir):
+            for file in files:
+                if file.find("song") != -1:
+                    if os.path.splitext(file)[1] == '.sog':
+                        L.append(os.path.join(root, file))
+        return L
+
     def get_file_by_listdir(self, file_dir):
         L = []
         for file in os.listdir(file_dir):
@@ -120,7 +128,7 @@ class CheckMusic(object):
         if not os.path.exists(xls):
             self.mylogger.error("音乐表.xlsx文件缺失!")
             sys.exit(0)
-        df = pd.read_excel(xls, sheetname='关卡表')
+        df = pd.read_excel(xls, sheet_name='关卡表')
         df['songid'] = df['歌曲ID'].apply(lambda x: str(x).zfill(4))
         df['modestr'] = df['模式ID'].apply(lambda x: modestr_dict.get(x))
         df['mode_filename'] = df['模式ID'].apply(lambda x: mode_filename_dict.get(x))
@@ -206,17 +214,26 @@ class CheckMusic(object):
         # 检查Music目录下的songxxxx.smp文件
         # 目标文件夹下已上传存在的音乐smp文件列表
         music_file_list_from_dir = self.get_music_smp_file(self.music_file_dir)
-        self.music['music_file_dir'] = self.music_file_dir + "\\song" + self.music['songid'] + ".smp"
-        music_file_list_from_music_xls = list(set(self.music['music_file_dir'].tolist()))
-        music_failed_file = list(set(music_file_list_from_music_xls).difference(set(music_file_list_from_dir)))
-        if len(music_failed_file) != 0:
-            self.mylogger.error("缺失的音乐资源smp文件为：%s" % list(set(music_failed_file)))
+        self.music['music_file_smp_dir'] = self.music_file_dir + "\\song" + self.music['songid'] + ".smp"
+        music_file_list_from_music_xls = list(set(self.music['music_file_smp_dir'].tolist()))
+        music_failed_smp_file = list(set(music_file_list_from_music_xls).difference(set(music_file_list_from_dir)))
+        if len(music_failed_smp_file) != 0:
+            self.mylogger.error("缺失的音乐资源smp文件为：%s" % list(set(music_failed_smp_file)))
         else:
             self.mylogger.info("音乐资源smp文件未缺失！")
-        return music_failed_file
+
+        music_file_list_from_dir = self.get_music_sog_file(self.music_file_dir)
+        self.music['music_file_sog_dir'] = self.music_file_dir + "\\song" + self.music['songid'] + ".sog"
+        music_file_list_from_music_xls = list(set(self.music['music_file_sog_dir'].tolist()))
+        music_failed_sog_file = list(set(music_file_list_from_music_xls).difference(set(music_file_list_from_dir)))
+        if len(music_failed_sog_file) != 0:
+            self.mylogger.error("缺失的音乐资源sog文件为：%s" % list(set(music_failed_sog_file)))
+        else:
+            self.mylogger.info("音乐资源sog文件未缺失！")
+        return music_failed_smp_file, music_failed_sog_file
 
     def process_dama(self, xls):
-        dama = pd.read_excel(xls, sheetname='歌曲表')
+        dama = pd.read_excel(xls, sheet_name='歌曲表')
         # .map(str)实现数据转换，强制转换为string型
         dama['id_mode_level'] = dama['歌曲ID'].map(str) + ',' + dama['模式ID'].map(str) + ',' + dama['难度'].map(str)
         dama_song_list = list(set(dama['id_mode_level'].tolist()))
@@ -228,7 +245,7 @@ class CheckMusic(object):
         return dama_failed_file
 
     def process_lwstar(self, xls):
-        lwstar = pd.read_excel(xls, sheetname='考核项')
+        lwstar = pd.read_excel(xls, sheet_name='考核项')
         # 恋舞之星后面阶段为pvp不需要配置歌曲和模式，空值行需删除
         # axis: 维度，axis = 0表示index行, axis = 1表示columns列，默认为0
         # how: "all"表示这一行或列中的元素全部缺失（为nan）才删除这一行或列，
@@ -252,7 +269,7 @@ class CheckMusic(object):
         return lwstar_failed_file
 
     def process_magiclamp(self, xls):
-        magiclamp = pd.read_excel(xls, sheetname='主线关卡')
+        magiclamp = pd.read_excel(xls, sheet_name='主线关卡')
         # .map(str)实现数据转换，强制转换为string型
         magiclamp['id_mode_level'] = magiclamp['歌曲ID'].map(str) + ',' + magiclamp['歌曲模式'].map(str) + ',' + magiclamp[
             '歌曲难度'].map(str)
@@ -263,7 +280,7 @@ class CheckMusic(object):
         else:
             self.mylogger.info("魔法神灯.xlsx-主线关卡sheet检查通过！")
 
-        magiclamp = pd.read_excel(xls, sheetname='主题关卡')
+        magiclamp = pd.read_excel(xls, sheet_name='主题关卡')
         # .map(str)实现数据转换，强制转换为string型
         magiclamp['id_mode_level'] = magiclamp['歌曲ID'].map(str) + ',' + magiclamp['歌曲模式'].map(str) + ',' + magiclamp[
             '歌曲难度'].map(str)
@@ -276,7 +293,7 @@ class CheckMusic(object):
         return magiclamp_failed_file_line, magiclamp_failed_file_theme
 
     def process_fairlyland(self, xls):
-        fairlyland = pd.read_excel(xls, sheetname='FairlylandChapter')
+        fairlyland = pd.read_excel(xls, sheet_name='FairlylandChapter')
         # .map(str)实现数据转换，强制转换为string型
         fairlyland['id_mode_level'] = fairlyland['MusicId'].map(str) + ',' + fairlyland['DanceType'].map(str) + ',' + \
                                       fairlyland['DifficultyLevel'].map(str)
@@ -289,7 +306,7 @@ class CheckMusic(object):
         return fairlyland_failed_file
 
     def process_starmentor(self, xls):
-        starmentor = pd.read_excel(xls, sheetname='关卡')
+        starmentor = pd.read_excel(xls, sheet_name='关卡')
         # .map(str)实现数据转换，强制转换为string型
         starmentor['id_mode_level'] = starmentor['歌曲ID'].map(str) + ',' + starmentor['歌曲模式'].map(str) + ',' + \
                                       starmentor['歌曲难度'].map(str)
@@ -302,7 +319,7 @@ class CheckMusic(object):
         return starmentor_failed_file
 
     def process_diamondleague(self, xls):
-        diamondleague = pd.read_excel(xls, sheetname='活动时间')
+        diamondleague = pd.read_excel(xls, sheet_name='活动时间')
         # .map(str)实现数据转换，强制转换为string型
         diamondleague['id_mode_level'] = diamondleague['歌曲ID'].map(str) + ',' + diamondleague['歌曲模式'].map(str) + ',' + \
                                          diamondleague['歌曲难度'].map(str)
@@ -315,7 +332,7 @@ class CheckMusic(object):
         return diamondleague_failed_file
 
     def process_musicrank(self, xls):
-        musicrank = pd.read_excel(xls, sheetname='榜单模式')
+        musicrank = pd.read_excel(xls, sheet_name='榜单模式')
         # .map(str)实现数据转换，强制转换为string型
         # 音悦榜默认歌曲难度为困难模式，id=3
         musicrank['id_mode_level'] = musicrank['歌曲ID'].map(str) + ',' + musicrank['模式ID'].map(str) + ',3'
