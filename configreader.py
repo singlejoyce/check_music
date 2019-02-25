@@ -1,8 +1,8 @@
 # _*_ coding: utf-8 _*_
 
-__author__ = "joyce"
-
 import configparser
+
+__author__ = "joyce"
 
 
 class ConfigReader(object):

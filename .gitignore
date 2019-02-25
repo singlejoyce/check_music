@@ -1,3 +1,6 @@
 ##ignore this file##
 .idea
+dist
+build
 __pycache__
+./mainui.spec

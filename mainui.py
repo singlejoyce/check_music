@@ -1,8 +1,10 @@
-import sys
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import *
 from checkmusic import *
 from configreader import *
+
+
+__author__ = "joyce"
 
 
 class Example(QWidget):
@@ -128,7 +130,7 @@ class Example(QWidget):
         self.check_diamondleague.setText(_translate("Dialog", "检查钻石联赛歌曲配置"))
         self.startButton.setText(_translate("Dialog", "开始检查"))
         self.label_7.setText(_translate("Dialog", "结果说明:\n配置正常时结果格式为：[]\n配置异常时结果格式为：[歌曲ID,歌曲模式,歌曲难度]"))
-        self.label_8.setText(_translate("Dialog", "IOS-Animations地址："))
+        self.label_8.setText(_translate("Dialog", "iOS-Animations地址："))
 
         # 将配置加载到界面显示
         # 勾选框显示处理
@@ -158,7 +160,7 @@ class Example(QWidget):
             event.ignore()
 
     def save_config(self):
-        fp = 'Config.ini'
+        fp = os.getcwd() + "\\Config\\Config.ini"
         if os.path.exists(fp):
             config = ConfigReader(fp)
             config.setdic('fileDir', 'music_file_dir', self.music_file_dir.toPlainText())
@@ -180,40 +182,52 @@ class Example(QWidget):
             with open(fp, "w+") as f:
                 config.CReader.write(f)
 
+    def synch_config(self):
         # 将修改的状态同步到checkmusic类中
         if os.path.exists(self.music_file_dir.toPlainText()):
             music.music_file_dir = self.music_file_dir.toPlainText()
         else:
-            QMessageBox.critical(self, "提示", self.tr("资源地址不存在，请检查!"), QMessageBox.Ok)
-            return
+            reply = QMessageBox.critical(self, "提示", self.tr("资源地址不存在，请检查!"), QMessageBox.Ok)
+            if reply == QMessageBox.Ok:
+                return False
 
         if os.path.exists(self.stage_dir.toPlainText()):
             music.stage_dir = self.stage_dir.toPlainText()
         else:
-            QMessageBox.critical(self, "提示", self.tr("资源地址不存在，请检查!"), QMessageBox.Ok)
-            return
+            reply = QMessageBox.critical(self, "提示", self.tr("资源地址不存在，请检查!"), QMessageBox.Ok)
+            if reply == QMessageBox.Ok:
+                return False
 
         if os.path.exists(self.controller_txt_dir.toPlainText()):
-            music.music_file_dir = self.controller_txt_dir.toPlainText()
+            music.controller_txt_dir = self.controller_txt_dir.toPlainText()
         else:
-            QMessageBox.critical(self, "提示", self.tr("资源地址不存在，请检查!"), QMessageBox.Ok)
-            return
+            reply = QMessageBox.critical(self, "提示", self.tr("资源地址不存在，请检查!"), QMessageBox.Ok)
+            if reply == QMessageBox.Ok:
+                return False
 
         if os.path.exists(self.adb_assetbundle_file_dir.toPlainText()):
-            music.music_file_dir = self.adb_assetbundle_file_dir.toPlainText()
+            music.adb_assetbundle_file_dir = self.adb_assetbundle_file_dir.toPlainText()
         else:
-            QMessageBox.critical(self, "提示", self.tr("资源地址不存在，请检查!"), QMessageBox.Ok)
-            return
+            reply = QMessageBox.critical(self, "提示", self.tr("资源地址不存在，请检查!"), QMessageBox.Ok)
+            if reply == QMessageBox.Ok:
+                return False
 
         if os.path.exists(self.ios_assetbundle_file_dir.toPlainText()):
-            music.music_file_dir = self.ios_assetbundle_file_dir.toPlainText()
+            music.ios_assetbundle_file_dir = self.ios_assetbundle_file_dir.toPlainText()
         else:
-            QMessageBox.critical(self, "提示", self.tr("资源地址不存在，请检查!"), QMessageBox.Ok)
-            return
+            reply = QMessageBox.critical(self, "提示", self.tr("资源地址不存在，请检查!"), QMessageBox.Ok)
+            if reply == QMessageBox.Ok:
+                # sys.exit(0)
+                return False
+        return True
 
     def start(self):
         # 将修改的状态进行保存和同步
+        state = self.synch_config()
+        if not state:
+            return False
         self.save_config()
+
         resultstr = ''
 
         # 检查音乐表中相关资源是否存在
@@ -230,43 +244,78 @@ class Example(QWidget):
         if self.check_stage.isChecked():
             result = music.process_stage()
             resultstr = resultstr + "\n安卓平台stage文件文件检查结果：" + str(result[0]) + \
-                        "\nios平台stage文件文件检查结果：" + str(result[1])
+                        "\niOS平台stage文件文件检查结果：" + str(result[1])
 
         # 检查其他功能模块中配置的歌曲信息在音乐表中是否存在
         if self.check_dama.isChecked():
-            result = music.process_dama()
+            xls = os.getcwd() + "\\Config\\广场舞大妈.xlsx"
+            if not os.path.exists(xls):
+                reply = QMessageBox.critical(self, "提示", self.tr("广场舞大妈.xlsx不存在，请检查!"), QMessageBox.Ok)
+                if reply == QMessageBox.Ok:
+                    return False
+            result = music.process_dama(xls)
             resultstr = resultstr + "\n广场舞大妈.xlsx检查结果：" + str(result)
 
         if self.check_fairlyland.isChecked():
-            result = music.process_fairlyland()
+            xls = os.getcwd() + "\\Config\\舞团秘境.xlsx"
+            if not os.path.exists(xls):
+                reply = QMessageBox.critical(self, "提示", self.tr("舞团秘境.xlsx不存在，请检查!"), QMessageBox.Ok)
+                if reply == QMessageBox.Ok:
+                    return False
+            result = music.process_fairlyland(xls)
             resultstr = resultstr + "\n舞团秘境.xlsx检查结果：" + str(result)
 
         if self.check_lwstar.isChecked():
-            result = music.process_lwstar()
+            xls = os.getcwd() + "\\Config\\恋舞之星.xlsx"
+            if not os.path.exists(xls):
+                reply = QMessageBox.critical(self, "提示", self.tr("恋舞之星.xlsx不存在，请检查!"), QMessageBox.Ok)
+                if reply == QMessageBox.Ok:
+                    return False
+            result = music.process_lwstar(xls)
             resultstr = resultstr + "\n恋舞之星.xlsx检查结果：" + str(result)
 
         if self.check_magiclamp.isChecked():
-            result = music.process_magiclamp()
+            xls = os.getcwd() + "\\Config\\魔法神灯.xlsx"
+            if not os.path.exists(xls):
+                reply = QMessageBox.critical(self, "提示", self.tr("魔法神灯.xlsx.xlsx不存在，请检查!"), QMessageBox.Ok)
+                if reply == QMessageBox.Ok:
+                    return False
+            result = music.process_magiclamp(xls)
             resultstr = resultstr + "\n魔法神灯.xlsx-主线关卡检查结果：" + str(result[0]) + \
                         "\n魔法神灯.xlsx-主题关卡检查结果：" + str(result[1])
 
         if self.check_diamondleague.isChecked():
-            result = music.process_diamondleague()
+            xls = os.getcwd() + "\\Config\\钻石联赛.xlsx"
+            if not os.path.exists(xls):
+                reply = QMessageBox.critical(self, "提示", self.tr("钻石联赛.xlsx不存在，请检查!"), QMessageBox.Ok)
+                if reply == QMessageBox.Ok:
+                    return False
+            result = music.process_diamondleague(xls)
             resultstr = resultstr + "\n钻石联赛.xlsx检查结果：" + str(result)
 
         if self.check_musicrank.isChecked():
-            result = music.process_musicrank()
+            xls = os.getcwd() + "\\Config\\音悦榜.xlsx"
+            if not os.path.exists(xls):
+                reply = QMessageBox.critical(self, "提示", self.tr("音悦榜.xlsx不存在，请检查!"), QMessageBox.Ok)
+                if reply == QMessageBox.Ok:
+                    return False
+            result = music.process_musicrank(xls)
             resultstr = resultstr + "\n音悦榜.xlsx检查结果：" + str(result)
 
         if self.check_starmentor.isChecked():
-            result = music.process_starmentor()
+            xls = os.getcwd() + "\\Config\\星恋挑战.xlsx"
+            if not os.path.exists(xls):
+                reply = QMessageBox.critical(self, "提示", self.tr("星恋挑战.xlsx不存在，请检查!"), QMessageBox.Ok)
+                if reply == QMessageBox.Ok:
+                    return False
+            result = music.process_starmentor(xls)
             resultstr = resultstr + "\n星恋挑战.xlsx检查结果：" + str(result)
 
         # 结果输入到resulttxt框控件内
         self.resulttxt.setPlainText(resultstr)
         # 检查结束，弹出检查完成提示框
         QMessageBox.information(self, "提示", self.tr("音乐检查完成!"), QMessageBox.Ok)
-
+        return True
 
 if __name__ == '__main__':
     music = CheckMusic()
