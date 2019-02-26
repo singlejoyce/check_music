@@ -17,6 +17,7 @@ class MainUi(QWidget):
         self.startButton = QPushButton("开始检查")
         self.startButton.clicked.connect(self.start)
         self.resultEditor = QTextEdit()
+        self.check_quest = QCheckBox("检查任务中歌曲配置")
         self.check_diamondleague = QCheckBox("检查钻石联赛歌曲配置")
         self.check_musicrank = QCheckBox("检查音悦榜歌曲配置")
         self.check_starmentor = QCheckBox("检查星恋挑战关卡配置")
@@ -39,6 +40,7 @@ class MainUi(QWidget):
         self.check_starmentor.setChecked(int(music.check_starmentor))
         self.check_musicrank.setChecked(int(music.check_musicrank))
         self.check_diamondleague.setChecked(int(music.check_diamondleague))
+        self.check_quest.setChecked(int(music.check_quest))
         # 文本框内文字显示处理
         self.stage_dir_Editor = QLineEdit(music.stage_dir)
         self.music_file_dir_Editor = QLineEdit(music.music_file_dir)
@@ -90,6 +92,7 @@ class MainUi(QWidget):
         checkbtnGroupBox1.setLayout(checkbtn_layout1)
 
         checkbtn_layout2 = QVBoxLayout()
+        checkbtn_layout2.addWidget(self.check_quest)
         checkbtn_layout2.addWidget(self.check_fairlyland)
         checkbtn_layout2.addWidget(self.check_magiclamp)
         checkbtn_layout2.addWidget(self.check_dama)
@@ -150,6 +153,7 @@ class MainUi(QWidget):
             config.setdic('checkStatus', 'check_starmentor', str(self.check_starmentor.checkState()))
             config.setdic('checkStatus', 'check_musicrank', str(self.check_musicrank.checkState()))
             config.setdic('checkStatus', 'check_diamondleague', str(self.check_diamondleague.checkState()))
+            config.setdic('checkStatus', 'check_quest', str(self.check_quest.checkState()))
             with open(fp, "w+") as f:
                 config.CReader.write(f)
 
@@ -261,6 +265,15 @@ class MainUi(QWidget):
                     return False
             result = music.process_diamondleague(xls)
             self.resultEditor.append("钻石联赛.xlsx检查结果：" + str(result))
+
+        if self.check_quest.isChecked():
+            xml = os.getcwd() + "\\Config\\quest.xml"
+            if not os.path.exists(xml):
+                reply = QMessageBox.critical(self, "提示", self.tr("quest.xml不存在，请检查!"), QMessageBox.Ok)
+                if reply == QMessageBox.Ok:
+                    return False
+            result = music.process_quest(xml)
+            self.resultEditor.append("quest.xml检查结果：" + str(result))
 
         if self.check_musicrank.isChecked():
             xls = os.getcwd() + "\\Config\\音悦榜.xlsx"

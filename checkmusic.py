@@ -5,6 +5,8 @@ import sys
 from logger import Logger
 from configreader import *
 import pandas as pd
+import xml.etree.ElementTree as et
+
 
 __author__ = "joyce"
 
@@ -36,6 +38,7 @@ class CheckMusic(object):
         self.check_starmentor = self.config.getdic('checkStatus')['check_starmentor']
         self.check_musicrank = self.config.getdic('checkStatus')['check_musicrank']
         self.check_diamondleague = self.config.getdic('checkStatus')['check_diamondleague']
+        self.check_quest = self.config.getdic('checkStatus')['check_quest']
 
         # 读取音乐表信息
         self.music = self.read_musicinfo_excel()
@@ -325,3 +328,51 @@ class CheckMusic(object):
         else:
             self.mylogger.info("音悦榜.xlsx检查通过！")
         return musicrank_failed_file
+
+    def if_match(self, node, kv_map):
+        """判断某个节点是否包含所有传入参数属性
+           node: 节点
+           kv_map: 属性及属性值组成的map"""
+        for key in kv_map:
+            if node.get(key) != kv_map.get(key):
+                return False
+        return True
+
+    # ---------------search -----
+    def find_nodes(self, tree, path):
+        """查找某个路径匹配的所有节点
+           tree: xml树
+           path: 节点路径"""
+        return tree.findall(path)
+
+    def get_node_by_keyvalue(self, nodelist, kv_map):
+        """根据属性及属性值定位符合的节点，返回节点
+           nodelist: 节点列表
+           kv_map: 匹配属性及属性值map"""
+        result_nodes = []
+        for node in nodelist:
+            if self.if_match(node, kv_map):
+                result_nodes.append(node)
+        return result_nodes
+
+    def process_quest(self, xml):
+        tree = et.parse(xml)
+        nodes = self.find_nodes(tree, "Quest/QuestDocument/Comp/Music")
+        quest_song_list = []
+        for node in nodes:
+            node_attrib = node.attrib['ID']
+            if node_attrib != "0":
+                children_nodes = node.getchildren()
+                mode_node = self.get_node_by_keyvalue(children_nodes, {"Type": "Music_Complete_Mode"})
+                mode_node_attrib = mode_node[0].attrib['Value']
+                level_node = self.get_node_by_keyvalue(children_nodes, {"Type": "Music_Complete_Diff"})
+                level_node_attrib = level_node[0].attrib['Value']
+                id_mode_level = node_attrib + "," + mode_node_attrib + "," + level_node_attrib
+                quest_song_list.append(id_mode_level)
+
+        quest_failed_file = list(set(quest_song_list).difference(set(self.song_list_from_music_xls)))
+        if len(quest_failed_file) != 0:
+            self.mylogger.error("quest.xml中在音乐表中不存在的歌曲信息：%s" % list(set(quest_failed_file)))
+        else:
+            self.mylogger.info("quest.xml检查通过！")
+        return quest_failed_file

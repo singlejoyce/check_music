@@ -10,7 +10,7 @@
       <BaseInfo ID="8000" Name="[简单]The Spectre" GroupID="1" CompleteTimes="-1" QuestTarget="0" TimeType="3" StartTime="0" EndTime="0" LastTime="0" QuestType="2" QuestLevel="0" DayTimes="1" Description="  如果您达成如下条件,将会获得指定的任务奖励!&#xD;&#xA;" SkipUI="6" Priority="2" />
       <Cond Type="Quest_Condition_LevelMin" Value="10" />
       <Comp Type="Quest_Complete_UseMusic">
-        <Music ID="2385" Count="1">
+        <Music ID="1111" Count="1">
           <Comp Type="Music_Complete_Diff" Value="1" />
           <Comp Type="Music_Complete_SceneHuman" Value="2" />
           <Comp Type="Music_Complete_Mode" Value="1" />
