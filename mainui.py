@@ -9,31 +9,32 @@ __author__ = "joyce"
 class Example(QWidget):
     def __init__(self):
         super().__init__()
+        self.music_file_dir = QtWidgets.QTextEdit(self)
+        self.adb_assetbundle_file_dir = QtWidgets.QTextEdit(self)
+        self.controller_txt_dir = QtWidgets.QTextEdit(self)
+        self.stage_dir = QtWidgets.QTextEdit(self)
+        self.ios_assetbundle_file_dir = QtWidgets.QTextEdit(self)
+        self.resulttxt = QtWidgets.QTextEdit(self)
+        self.label = QtWidgets.QLabel(self)
+        self.label_2 = QtWidgets.QLabel(self)
+        self.label_3 = QtWidgets.QLabel(self)
+        self.label_4 = QtWidgets.QLabel(self)
+        self.label_5 = QtWidgets.QLabel(self)
+        self.label_6 = QtWidgets.QLabel(self)
+        self.label_7 = QtWidgets.QLabel(self)
+        self.label_8 = QtWidgets.QLabel(self)
         self.check_assetbundle = QtWidgets.QCheckBox(self)
         self.check_musicsmp = QtWidgets.QCheckBox(self)
         self.check_stage = QtWidgets.QCheckBox(self)
-        self.music_file_dir = QtWidgets.QTextEdit(self)
-        self.label = QtWidgets.QLabel(self)
-        self.adb_assetbundle_file_dir = QtWidgets.QTextEdit(self)
-        self.label_2 = QtWidgets.QLabel(self)
-        self.controller_txt_dir = QtWidgets.QTextEdit(self)
-        self.label_3 = QtWidgets.QLabel(self)
-        self.stage_dir = QtWidgets.QTextEdit(self)
-        self.label_4 = QtWidgets.QLabel(self)
-        self.label_5 = QtWidgets.QLabel(self)
         self.check_fairlyland = QtWidgets.QCheckBox(self)
         self.check_magiclamp = QtWidgets.QCheckBox(self)
-        self.label_6 = QtWidgets.QLabel(self)
         self.check_dama = QtWidgets.QCheckBox(self)
         self.check_lwstar = QtWidgets.QCheckBox(self)
         self.check_starmentor = QtWidgets.QCheckBox(self)
         self.check_musicrank = QtWidgets.QCheckBox(self)
         self.check_diamondleague = QtWidgets.QCheckBox(self)
         self.startButton = QtWidgets.QPushButton(self)
-        self.label_8 = QtWidgets.QLabel(self)
-        self.ios_assetbundle_file_dir = QtWidgets.QTextEdit(self)
-        self.resulttxt = QtWidgets.QTextEdit(self)
-        self.label_7 = QtWidgets.QLabel(self)
+
         self.initUI()
 
     def initUI(self):
@@ -227,23 +228,20 @@ class Example(QWidget):
             return False
         self.save_config()
 
-        resultstr = ''
-
         # 检查音乐表中相关资源是否存在
         if self.check_assetbundle.isChecked():
             result = music.process_assetbundle()
-            resultstr = resultstr + "\nDance.txt文件检查结果：" + str(result[0]) + \
-                        "\n安卓平台动作文件检查结果：" + str(result[1]) + "\nios平台动作文件检查结果：" \
-                        + str(result[2])
+            self.resulttxt.append("Dance.txt文件检查结果：" + str(result[0]) + "\n安卓平台动作文件检查结果：" + str(result[1])
+                                  + "\niOS平台动作文件检查结果：" + str(result[2]))
 
         if self.check_musicsmp.isChecked():
             result = music.process_music_smp()
-            resultstr = resultstr + "\n音乐smp文件检查结果：" + str(result[0]) + "\n音乐sog文件检查结果：" + str(result[1])
+            self.resulttxt.append("音乐smp文件检查结果：" + str(result[0]) + "\n音乐sog文件检查结果：" + str(result[1]))
 
         if self.check_stage.isChecked():
             result = music.process_stage()
-            resultstr = resultstr + "\n安卓平台stage文件文件检查结果：" + str(result[0]) + \
-                        "\niOS平台stage文件文件检查结果：" + str(result[1])
+            self.resulttxt.append("安卓平台stage文件文件检查结果：" + str(result[0]) +
+                                  "\niOS平台stage文件文件检查结果：" + str(result[1]))
 
         # 检查其他功能模块中配置的歌曲信息在音乐表中是否存在
         if self.check_dama.isChecked():
@@ -253,7 +251,7 @@ class Example(QWidget):
                 if reply == QMessageBox.Ok:
                     return False
             result = music.process_dama(xls)
-            resultstr = resultstr + "\n广场舞大妈.xlsx检查结果：" + str(result)
+            self.resulttxt.append("广场舞大妈.xlsx检查结果：" + str(result))
 
         if self.check_fairlyland.isChecked():
             xls = os.getcwd() + "\\Config\\舞团秘境.xlsx"
@@ -262,7 +260,7 @@ class Example(QWidget):
                 if reply == QMessageBox.Ok:
                     return False
             result = music.process_fairlyland(xls)
-            resultstr = resultstr + "\n舞团秘境.xlsx检查结果：" + str(result)
+            self.resulttxt.append("舞团秘境.xlsx检查结果：" + str(result))
 
         if self.check_lwstar.isChecked():
             xls = os.getcwd() + "\\Config\\恋舞之星.xlsx"
@@ -271,7 +269,7 @@ class Example(QWidget):
                 if reply == QMessageBox.Ok:
                     return False
             result = music.process_lwstar(xls)
-            resultstr = resultstr + "\n恋舞之星.xlsx检查结果：" + str(result)
+            self.resulttxt.append("恋舞之星.xlsx检查结果：" + str(result))
 
         if self.check_magiclamp.isChecked():
             xls = os.getcwd() + "\\Config\\魔法神灯.xlsx"
@@ -280,8 +278,8 @@ class Example(QWidget):
                 if reply == QMessageBox.Ok:
                     return False
             result = music.process_magiclamp(xls)
-            resultstr = resultstr + "\n魔法神灯.xlsx-主线关卡检查结果：" + str(result[0]) + \
-                        "\n魔法神灯.xlsx-主题关卡检查结果：" + str(result[1])
+            self.resulttxt.append("魔法神灯.xlsx-主线关卡检查结果：" + str(result[0]) +
+                                  "\n魔法神灯.xlsx-主题关卡检查结果：" + str(result[1]))
 
         if self.check_diamondleague.isChecked():
             xls = os.getcwd() + "\\Config\\钻石联赛.xlsx"
@@ -290,7 +288,7 @@ class Example(QWidget):
                 if reply == QMessageBox.Ok:
                     return False
             result = music.process_diamondleague(xls)
-            resultstr = resultstr + "\n钻石联赛.xlsx检查结果：" + str(result)
+            self.resulttxt.append("钻石联赛.xlsx检查结果：" + str(result))
 
         if self.check_musicrank.isChecked():
             xls = os.getcwd() + "\\Config\\音悦榜.xlsx"
@@ -299,7 +297,7 @@ class Example(QWidget):
                 if reply == QMessageBox.Ok:
                     return False
             result = music.process_musicrank(xls)
-            resultstr = resultstr + "\n音悦榜.xlsx检查结果：" + str(result)
+            self.resulttxt.append("音悦榜.xlsx检查结果：" + str(result))
 
         if self.check_starmentor.isChecked():
             xls = os.getcwd() + "\\Config\\星恋挑战.xlsx"
@@ -308,10 +306,8 @@ class Example(QWidget):
                 if reply == QMessageBox.Ok:
                     return False
             result = music.process_starmentor(xls)
-            resultstr = resultstr + "\n星恋挑战.xlsx检查结果：" + str(result)
+            self.resulttxt.append("星恋挑战.xlsx检查结果：" + str(result))
 
-        # 结果输入到resulttxt框控件内
-        self.resulttxt.setPlainText(resultstr)
         # 检查结束，弹出检查完成提示框
         QMessageBox.information(self, "提示", self.tr("音乐检查完成!"), QMessageBox.Ok)
         return True
