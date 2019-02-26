@@ -10,7 +10,7 @@ from PyQt5.QtWidgets import QWidget, QMessageBox, QCheckBox, QPushButton, QAppli
     QVBoxLayout, \
     QGridLayout, QFormLayout, QLineEdit, QTextEdit
 
-__author__ = 'Tony Zhu'
+__author__ = "joyce"
 
 
 class MainUi(QWidget):
