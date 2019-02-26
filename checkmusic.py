@@ -27,7 +27,7 @@ class CheckMusic(object):
         self.ios_assetbundle_file_dir = self.config.getdic('fileDir')['ios_assetbundle_file_dir']
 
         self.check_assetbundle = self.config.getdic('checkStatus')['check_assetbundle']
-        self.check_musicsmp = self.config.getdic('checkStatus')['check_musicsmp']
+        self.check_music = self.config.getdic('checkStatus')['check_music']
         self.check_stage = self.config.getdic('checkStatus')['check_stage']
         self.check_fairlyland = self.config.getdic('checkStatus')['check_fairlyland']
         self.check_dama = self.config.getdic('checkStatus')['check_dama']

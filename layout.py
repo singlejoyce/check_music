@@ -6,9 +6,7 @@ Basic Layout
 from checkmusic import *
 from configreader import *
 from PyQt5 import QtGui
-from PyQt5.QtWidgets import QWidget, QMessageBox, QCheckBox, QPushButton, QApplication, QGroupBox, QLabel, QHBoxLayout, \
-    QVBoxLayout, \
-    QGridLayout, QFormLayout, QLineEdit, QTextEdit
+from PyQt5.QtWidgets import *
 
 __author__ = "joyce"
 
@@ -32,7 +30,7 @@ class MainUi(QWidget):
 
         # 勾选框状态显示处理
         self.check_assetbundle.setChecked(int(music.check_assetbundle))
-        self.check_musicsmp.setChecked(int(music.check_musicsmp))
+        self.check_music.setChecked(int(music.check_music))
         self.check_stage.setChecked(int(music.check_stage))
         self.check_fairlyland.setChecked(int(music.check_fairlyland))
         self.check_dama.setChecked(int(music.check_dama))
