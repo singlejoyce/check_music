@@ -245,13 +245,18 @@ class CheckMusic(object):
 
     def process_lwstar(self, xls):
         lwstar = pd.read_excel(xls, sheet_name='考核项')
-        lwstar.dropna(axis=0, how='any', thresh=None, subset=None, inplace=True)
+        # 去掉空数据 ！！！异常了 把想要的数据也清了！！！ 换成fillna函数处理
+        # lwstar.dropna(axis=0, how='any', thresh=None, subset=None, inplace=True)
+        lwstar.fillna(value=0, inplace=True)
         # 恋舞之星中格式为float64，需先转换为int型
         lwstar['歌曲ID'] = lwstar['歌曲ID'].map(int)
         lwstar['模式'] = lwstar['模式'].map(int)
         lwstar['难度'] = lwstar['难度'].map(int)
         lwstar['id_mode_level'] = lwstar['歌曲ID'].map(str) + ',' + lwstar['模式'].map(str) + ',' + lwstar['难度'].map(str)
         lwstar_song_list = list(set(lwstar['id_mode_level'].tolist()))
+        # 去掉补零的数据
+        lwstar_song_list.remove('0,0,0')
+        # 列表差值
         lwstar_failed_file = list(set(lwstar_song_list).difference(set(self.song_list_from_music_xls)))
         if len(lwstar_failed_file) != 0:
             self.mylogger.error("恋舞之星.xlsx中在音乐表中不存在的歌曲信息：%s" % list(set(lwstar_failed_file)))

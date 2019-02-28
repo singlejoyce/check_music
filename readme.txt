@@ -39,6 +39,8 @@ thresh: 一行或一列中至少出现了thresh个才删除。
 subset：在某些列的子集中选择出现了缺失值的列删除，不在子集中的含有缺失值得列或行不会删除（有axis决定是行还是列）
 inplace：刷选过缺失值得新数据是存为副本还是直接在原数据上进行修改。
 
+lwstar.fillna(value=None, method=None, axis=None, inplace=False, limit=None, downcast=None, **kwargs)
+
 6、QMessageBox的使用方法：
 reply = QMessageBox.information(self,  # 使用infomation信息框
                             "标题",
