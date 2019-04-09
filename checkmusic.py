@@ -7,7 +7,6 @@ from configreader import *
 import pandas as pd
 import xml.etree.ElementTree as et
 
-
 __author__ = "joyce"
 
 
@@ -234,6 +233,12 @@ class CheckMusic(object):
 
     def process_dama(self, xls):
         dama = pd.read_excel(xls, sheet_name='歌曲表')
+
+        dama.fillna(value=0, inplace=True)
+        dama['歌曲ID'] = dama['歌曲ID'].map(int)
+        dama['模式ID'] = dama['模式ID'].map(int)
+        dama['难度'] = dama['难度'].map(int)
+
         dama['id_mode_level'] = dama['歌曲ID'].map(str) + ',' + dama['模式ID'].map(str) + ',' + dama['难度'].map(str)
         dama_song_list = list(set(dama['id_mode_level'].tolist()))
         dama_failed_file = list(set(dama_song_list).difference(set(self.song_list_from_music_xls)))
@@ -245,6 +250,7 @@ class CheckMusic(object):
 
     def process_lwstar(self, xls):
         lwstar = pd.read_excel(xls, sheet_name='考核项')
+
         # 去掉空数据 ！！！异常了 把想要的数据也清了！！！ 换成fillna函数处理
         # lwstar.dropna(axis=0, how='any', thresh=None, subset=None, inplace=True)
         lwstar.fillna(value=0, inplace=True)
@@ -252,6 +258,7 @@ class CheckMusic(object):
         lwstar['歌曲ID'] = lwstar['歌曲ID'].map(int)
         lwstar['模式'] = lwstar['模式'].map(int)
         lwstar['难度'] = lwstar['难度'].map(int)
+
         lwstar['id_mode_level'] = lwstar['歌曲ID'].map(str) + ',' + lwstar['模式'].map(str) + ',' + lwstar['难度'].map(str)
         lwstar_song_list = list(set(lwstar['id_mode_level'].tolist()))
         # 去掉补零的数据
@@ -288,8 +295,13 @@ class CheckMusic(object):
 
     def process_fairlyland(self, xls):
         fairlyland = pd.read_excel(xls, sheet_name='FairlylandChapter')
-        fairlyland['id_mode_level'] = fairlyland['MusicId'].map(str) + ',' + fairlyland['DanceType'].map(str) + ',' + \
-                                      fairlyland['DifficultyLevel'].map(str)
+
+        fairlyland.fillna(value=0, inplace=True)
+        fairlyland['MusicId'] = fairlyland['MusicId'].map(int)
+        fairlyland['DanceType'] = fairlyland['DanceType'].map(int)
+        fairlyland['DifficultyLevel'] = fairlyland['DifficultyLevel'].map(int)
+
+        fairlyland['id_mode_level'] = fairlyland['MusicId'].map(str) + ',' + fairlyland['DanceType'].map(str) + ',' + fairlyland['DifficultyLevel'].map(str)
         fairlyland_song_list = list(set(fairlyland['id_mode_level'].tolist()))
         fairlyland_failed_file = list(set(fairlyland_song_list).difference(set(self.song_list_from_music_xls)))
         if len(fairlyland_failed_file) != 0:
@@ -300,8 +312,13 @@ class CheckMusic(object):
 
     def process_starmentor(self, xls):
         starmentor = pd.read_excel(xls, sheet_name='关卡')
-        starmentor['id_mode_level'] = starmentor['歌曲ID'].map(str) + ',' + starmentor['歌曲模式'].map(str) + ',' + \
-                                      starmentor['歌曲难度'].map(str)
+
+        starmentor.fillna(value=0, inplace=True)
+        starmentor['歌曲ID'] = starmentor['歌曲ID'].map(int)
+        starmentor['歌曲模式'] = starmentor['歌曲模式'].map(int)
+        starmentor['歌曲难度'] = starmentor['歌曲难度'].map(int)
+
+        starmentor['id_mode_level'] = starmentor['歌曲ID'].map(str) + ',' + starmentor['歌曲模式'].map(str) + ',' + starmentor['歌曲难度'].map(str)
         starmentor_song_list = list(set(starmentor['id_mode_level'].tolist()))
         starmentor_failed_file = list(set(starmentor_song_list).difference(set(self.song_list_from_music_xls)))
         if len(starmentor_failed_file) != 0:
@@ -312,8 +329,14 @@ class CheckMusic(object):
 
     def process_diamondleague(self, xls):
         diamondleague = pd.read_excel(xls, sheet_name='活动时间')
-        diamondleague['id_mode_level'] = diamondleague['歌曲ID'].map(str) + ',' + diamondleague['歌曲模式'].map(str) + ',' + \
-                                         diamondleague['歌曲难度'].map(str)
+
+        # 去掉空数据 ！！！异常了 把想要的数据也清了！！！ 换成fillna函数处理
+        diamondleague.dropna(axis=0, how='any', thresh=None, subset=None, inplace=True)
+        diamondleague['歌曲ID'] = diamondleague['歌曲ID'].map(int)
+        diamondleague['歌曲模式'] = diamondleague['歌曲模式'].map(int)
+        diamondleague['歌曲难度'] = diamondleague['歌曲难度'].map(int)
+
+        diamondleague['id_mode_level'] = diamondleague['歌曲ID'].map(str) + ',' + diamondleague['歌曲模式'].map(str) + ',' + diamondleague['歌曲难度'].map(str)
         diamondleague_song_list = list(set(diamondleague['id_mode_level'].tolist()))
         diamondleague_failed_file = list(set(diamondleague_song_list).difference(set(self.song_list_from_music_xls)))
         if len(diamondleague_failed_file) != 0:
@@ -324,6 +347,11 @@ class CheckMusic(object):
 
     def process_musicrank(self, xls):
         musicrank = pd.read_excel(xls, sheet_name='榜单模式')
+
+        musicrank.fillna(value=0, inplace=True)
+        musicrank['歌曲ID'] = musicrank['歌曲ID'].map(int)
+        musicrank['模式ID'] = musicrank['模式ID'].map(int)
+
         # 音悦榜默认歌曲难度为困难模式，id=3
         musicrank['id_mode_level'] = musicrank['歌曲ID'].map(str) + ',' + musicrank['模式ID'].map(str) + ',3'
         musicrank_song_list = list(set(musicrank['id_mode_level'].tolist()))
