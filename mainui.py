@@ -2,8 +2,11 @@
 """
 Basic Layout
 """
+import sys
 
-from checkmusic import *
+import os
+
+from checkmusic import CheckMusic
 from configreader import *
 from PyQt5 import QtGui
 from PyQt5.QtWidgets import *
@@ -212,7 +215,17 @@ class MainUi(QWidget):
 
         if self.check_music.isChecked():
             result = music.process_music_smp()
-            self.resultEditor.append("音乐smp文件检查结果：" + str(result[0]) + "\n音乐sog文件检查结果：" + str(result[1]))
+            if len(result) == 0:
+                self.resultEditor.append("icon和音乐资源名称配置检查结果：[]\nsmp/sog音乐资源文件检查结果：[]")
+            else:
+                if 'icon' in result.keys():
+                    self.resultEditor.append("音乐表sheet音乐icon配置检查结果：" + str(result['icon']))
+                if 'musicfile' in result.keys():
+                    self.resultEditor.append("音乐表sheet音乐资源名称配置检查结果：" + str(result['musicfile']))
+                if 'smp' in result.keys():
+                    self.resultEditor.append("音乐smp文件检查结果：" + str(result['smp']))
+                if 'sog' in result.keys():
+                    self.resultEditor.append("音乐sog文件检查结果：" + str(result['sog']))
 
         if self.check_stage.isChecked():
             result = music.process_stage()

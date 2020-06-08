@@ -40,7 +40,7 @@ class CheckMusic(object):
         self.check_quest = self.config.getdic('checkStatus')['check_quest']
 
         # 读取音乐表信息
-        self.music = self.read_musicinfo_excel()
+        self.music, self.music_filename = self.read_musicinfo_excel()
         self.song_list_from_music_xls = list(set(self.music['id_mode_level'].tolist()))
 
     def get_dance_txt_file(self, file_dir):
@@ -84,6 +84,12 @@ class CheckMusic(object):
             for file in files:
                 L.append(os.path.join(root, file))
         return L
+
+    def compare(self, a, b):
+        if a == b:
+            return 1
+        else:
+            return 0
 
     def read_musicinfo_excel(self):
         # 模式id与模式对应的缩写转换
@@ -133,11 +139,20 @@ class CheckMusic(object):
         df['mode_filename'] = df['模式ID'].apply(lambda x: mode_filename_dict.get(x))
         df['levelstr'] = df['难度'].apply(lambda x: levelstr_dict.get(x))
         df['id_mode_level'] = df['歌曲ID'].map(str) + ',' + df['模式ID'].map(str) + ',' + df['难度'].map(str)
-        df_new = df[['歌曲名', 'songid', 'modestr', 'mode_filename', 'levelstr', 'id_mode_level']]
-        df_new.rename(columns={'歌曲名': 'name'}, inplace=True)
-        df_new.reset_index(drop=True, inplace=True)
+        df = df[['歌曲名', 'songid', 'modestr', 'mode_filename', 'levelstr', 'id_mode_level']]
+        df.rename(columns={'歌曲名': 'name'}, inplace=True)
+        df.reset_index(drop=True, inplace=True)
         # music_new.to_excel("result.xlsx", index=False)  # write data to excel
-        return df_new
+
+        df1 = pd.read_excel(xls, sheet_name='音乐表')
+        df1['音乐资源名称-new'] = df1['歌曲ID'].apply(lambda x: "song" + str(x).zfill(4))
+        df1['ICON-new'] = df1['歌曲ID'].apply(lambda x: "t_song" + str(x).zfill(4))
+        df1['icon-bool'] = df1.apply(lambda x: self.compare(x['ICON'], x['ICON-new']), axis=1)
+        df1['音乐资源名称-bool'] = df1.apply(lambda x: self.compare(x['音乐资源名称'], x['音乐资源名称-new']), axis=1)
+        df1 = df1[['歌曲ID', 'ICON', '音乐资源名称', 'ICON-new', '音乐资源名称-new', 'icon-bool', '音乐资源名称-bool']]
+        df1.reset_index(drop=True, inplace=True)
+
+        return df, df1
 
     def process_assetbundle(self):
         # 检查动作文件
@@ -209,6 +224,20 @@ class CheckMusic(object):
         return adb_stage_failed_file, ios_stage_failed_file
 
     def process_music_smp(self):
+        error_dict = {}
+        # 筛选对比结果值为0的列，如果有数据证明配置错误了，正常应该是2列一样的值的
+        if len(self.music_filename[self.music_filename['icon-bool'] == 0]) != 0:
+            error = self.music_filename[self.music_filename['icon-bool'] == 0]['歌曲ID'].tolist()
+            self.mylogger.error("音乐表sheet icon配置异常:\n %s" % error)
+            error_dict['icon'] = error
+        else:
+            self.mylogger.info("音乐表sheet icon配置正常")
+        if len(self.music_filename[self.music_filename['音乐资源名称-bool'] == 0]) != 0:
+            error = self.music_filename[self.music_filename['音乐资源名称-bool'] == 0]['歌曲ID'].tolist()
+            self.mylogger.error("音乐表sheet 音乐资源名称配置异常:\n %s" % error)
+            error_dict['musicfile'] = error
+        else:
+            self.mylogger.info("音乐表sheet 音乐资源名称配置正常")
         # 检查Music目录下的songxxxx.smp/.sog文件
         # 目标文件夹下已上传存在的音乐smp文件列表
         music_file_list_from_dir = self.get_music_smp_file(self.music_file_dir)
@@ -217,6 +246,7 @@ class CheckMusic(object):
         music_failed_smp_file = list(set(music_file_list_from_music_xls).difference(set(music_file_list_from_dir)))
         if len(music_failed_smp_file) != 0:
             self.mylogger.error("缺失的音乐资源smp文件为：%s" % list(set(music_failed_smp_file)))
+            error_dict['smp'] = list(set(music_failed_smp_file))
         else:
             self.mylogger.info("音乐资源smp文件未缺失！")
 
@@ -227,9 +257,10 @@ class CheckMusic(object):
         music_failed_sog_file = list(set(music_file_list_from_music_xls).difference(set(music_file_list_from_dir)))
         if len(music_failed_sog_file) != 0:
             self.mylogger.error("缺失的音乐资源sog文件为：%s" % list(set(music_failed_sog_file)))
+            error_dict['sog'] = list(set(music_failed_sog_file))
         else:
             self.mylogger.info("音乐资源sog文件未缺失！")
-        return music_failed_smp_file, music_failed_sog_file
+        return error_dict
 
     def process_dama(self, xls):
         dama = pd.read_excel(xls, sheet_name='歌曲表')
@@ -301,7 +332,8 @@ class CheckMusic(object):
         fairlyland['DanceType'] = fairlyland['DanceType'].map(int)
         fairlyland['DifficultyLevel'] = fairlyland['DifficultyLevel'].map(int)
 
-        fairlyland['id_mode_level'] = fairlyland['MusicId'].map(str) + ',' + fairlyland['DanceType'].map(str) + ',' + fairlyland['DifficultyLevel'].map(str)
+        fairlyland['id_mode_level'] = fairlyland['MusicId'].map(str) + ',' + fairlyland['DanceType'].map(str) + ',' + \
+                                      fairlyland['DifficultyLevel'].map(str)
         fairlyland_song_list = list(set(fairlyland['id_mode_level'].tolist()))
         fairlyland_failed_file = list(set(fairlyland_song_list).difference(set(self.song_list_from_music_xls)))
         if len(fairlyland_failed_file) != 0:
@@ -318,7 +350,8 @@ class CheckMusic(object):
         starmentor['歌曲模式'] = starmentor['歌曲模式'].map(int)
         starmentor['歌曲难度'] = starmentor['歌曲难度'].map(int)
 
-        starmentor['id_mode_level'] = starmentor['歌曲ID'].map(str) + ',' + starmentor['歌曲模式'].map(str) + ',' + starmentor['歌曲难度'].map(str)
+        starmentor['id_mode_level'] = starmentor['歌曲ID'].map(str) + ',' + starmentor['歌曲模式'].map(str) + ',' + \
+                                      starmentor['歌曲难度'].map(str)
         starmentor_song_list = list(set(starmentor['id_mode_level'].tolist()))
         starmentor_failed_file = list(set(starmentor_song_list).difference(set(self.song_list_from_music_xls)))
         if len(starmentor_failed_file) != 0:
@@ -336,7 +369,8 @@ class CheckMusic(object):
         diamondleague['歌曲模式'] = diamondleague['歌曲模式'].map(int)
         diamondleague['歌曲难度'] = diamondleague['歌曲难度'].map(int)
 
-        diamondleague['id_mode_level'] = diamondleague['歌曲ID'].map(str) + ',' + diamondleague['歌曲模式'].map(str) + ',' + diamondleague['歌曲难度'].map(str)
+        diamondleague['id_mode_level'] = diamondleague['歌曲ID'].map(str) + ',' + diamondleague['歌曲模式'].map(str) + ',' + \
+                                         diamondleague['歌曲难度'].map(str)
         diamondleague_song_list = list(set(diamondleague['id_mode_level'].tolist()))
         diamondleague_failed_file = list(set(diamondleague_song_list).difference(set(self.song_list_from_music_xls)))
         if len(diamondleague_failed_file) != 0:
